@@ -23,7 +23,7 @@ $ gem install db2_session
 ## Usage
 This plugin highly depends on [Db2Query](https://github.com/yohaneslumentut/db2_query). Where **Db2Query** is responsible to manage database queries and **Db2Session** is only responsible to manage user sessions in the controllers of each query.
 
-Note: Please do the Db2Query [**Installation**](https://github.com/yohaneslumentut/db2_query#1-installation) & [**Initialization**](https://github.com/yohaneslumentut/db2_query#2-initialization) steps before move to the next section.
+Note: Please do the Db2Query [**Initialization**](https://github.com/yohaneslumentut/db2_query#2-initialization) steps before move to the next section.
 
 Rules:
 > 1. **Queries** have to extend ApplicationQuery, an abstract query, which inherit all attributes and methods required from Db2Session::ApplicationQuery
@@ -56,6 +56,7 @@ Routes for Db2Session::Engine:
 Create an abstract query, here we use `ApplicationQuery` that extend `Db2Session::ApplicationQuery`. All of your query class have to extend this class. 
 
 ```ruby
+# app/queries/application_query.rb
 class ApplicationQuery < Db2Session::ApplicationQuery
   def self.inherited(subclass)
     subclass.define_query_definitions
@@ -66,7 +67,7 @@ end
 Then create a `Db2ConnectionQuery` that inherit from `ApplicationQUery`
 
 ```bash
-$ rails g query connection --defines status
+$ rails g query db2_connection --defines status
 ```
 ```ruby
 # app/queries/db2_connection_query.rb
