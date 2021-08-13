@@ -3,6 +3,7 @@
 module Db2Session
   class SessionsController < ApplicationController
     skip_around_action :authenticate!, only: [:new]
+    before_action :flush_idling_connections!, only: [:new]
 
     def new
       connection = create_new_connection

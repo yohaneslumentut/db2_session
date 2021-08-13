@@ -4,7 +4,6 @@ PATH
     db2_session (0.1.0)
       db2_query (~> 0.3.2)
       jwt
-      rails (~> 6.1.4)
       securerandom
 
 GEM
@@ -190,6 +189,7 @@ DEPENDENCIES
   byebug
   db2_session!
   faker
+  rails
   rubocop
   rubocop-performance
   rubocop-rails

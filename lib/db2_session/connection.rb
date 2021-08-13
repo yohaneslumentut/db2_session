@@ -2,7 +2,7 @@
 
 module Db2Session
   class Connection < Db2Query::Connection
-    attr_reader :token_key, :userid
+    attr_accessor :trx_time, :userid
 
     def initialize(config, userid, password)
       super(config)
@@ -10,7 +10,7 @@ module Db2Session
       singleton_class.define_method(:new_dbclient) do
         DbClient.new(config, userid, password)
       end
-      with { |conn| true }
+      verify_db_connection
     end
 
     def create_connection_pool
@@ -19,5 +19,10 @@ module Db2Session
         @connection_pool = Pool.new(pool_config) { new_dbclient }
       end
     end
+
+    private
+      def verify_db_connection
+        with { |conn| true }
+      end
   end
 end

@@ -5,7 +5,7 @@ require_relative "lib/db2_session/version"
 Gem::Specification.new do |spec|
   spec.name        = "db2_session"
   spec.version     = Db2Session::VERSION
-  spec.authors     = ["yohanes_l"]
+  spec.authors     = ["yohanes_o_lumentut"]
   spec.email       = ["yohanes.lumentut@gmail.com"]
   spec.homepage    = "https://github.com/yohaneslumentut/db2_session"
   spec.summary     = "Rails Db2 API session manager plugin"
@@ -25,9 +25,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop-rails"
   spec.add_development_dependency "faker"
   spec.add_development_dependency "byebug"
-  # spec.add_development_dependency "rails"
+  spec.add_development_dependency "rails"
 
-  spec.add_dependency "rails", "~> 6.1.4"
   spec.add_dependency "db2_query", "~> 0.3.2"
   spec.add_dependency "jwt"
   spec.add_dependency "securerandom"
