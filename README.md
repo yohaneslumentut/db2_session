@@ -51,7 +51,7 @@ Routes for Db2Session::Engine:
 ```
 
 ### Query By User Session
-***Db2Query** use only one user which is hardcoded at `config/db2query.yml`. Here, at Db2Session query, multi-user can make requests and queries by using their own db2 credential that is securely attached at connection client instance. The plugin will assign the connection to the related user on each request based on an attached token that was created during the `login` process.
+**Db2Query** use only one user which is hardcoded at `config/db2query.yml`. Here, at Db2Session query, multi-user can make requests and queries by using their own db2 credential that is securely attached at connection client instance. The plugin will assign the connection to the related user on each request based on an attached token that was created during the `login` process.
 
 Create an abstract query, here we use `ApplicationQuery` that extend `Db2Session::ApplicationQuery`. All of your query class have to extend this class. 
 
