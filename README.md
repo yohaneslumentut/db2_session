@@ -183,5 +183,46 @@ Then the response will be as follow:
 
 Now the token can be use on each request to your application.
 
+### How to test a Query
+
+Create a base query test class that extend `ActionDispatch::IntegrationTest`:
+```ruby
+# app/test/queries/db2_query_test.rb
+
+class Db2QueryTest < ActionDispatch::IntegrationTest
+  attr_reader :request_token
+
+  include Db2Session::Manager
+
+  setup do
+    # get the credentials from environment variable
+    user_1 = ENV["USER1_ID"]   
+    user_1_password = ENV["USER1_PASSWORD"]
+
+    db2_session = Db2Session::Engine.routes.url_helpers
+    post db2_session.login_path, params: { userid: user_1, password: user_1_password }, as: :json
+    @request_token = @response["Authorization"].split(" ").last
+
+    Thread.current[:connection] = current_connection
+  end
+end
+```
+
+Then your query test class can extend the base query test class, for example:
+```ruby
+# app/test/queries/db2_connection_query_test.rb
+
+require "test_helper"
+require_relative "./db2_query_test"
+
+class Db2ConnectionQueryTest < Db2QueryTest
+  test "connection status" do
+    status = Db2ConnectionQuery.status
+    assert status.connected
+  end
+end
+
+```
+
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
