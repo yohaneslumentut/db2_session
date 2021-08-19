@@ -210,7 +210,7 @@ module Db2Session
 end
 ```
 
-Then your query test class can extend the base query test class, for example:
+Then extend it at your query test:
 ```ruby
 # app/test/queries/db2_connection_query_test.rb
 
