@@ -185,25 +185,27 @@ Now the token can be use on each request to your application.
 
 ### How to test a Query
 
-Create a base query test class that extend `ActionDispatch::IntegrationTest`:
+Create `Db2Session::IntegrationTest` class that extend `ActionDispatch::IntegrationTest`:
 ```ruby
-# app/test/queries/db2_query_test.rb
+# app/test/test_helper.rb
 
-class Db2QueryTest < ActionDispatch::IntegrationTest
-  attr_reader :request_token
+module Db2Session
+  class  IntegrationTest < ActionDispatch::IntegrationTest
+    attr_reader :request_token
 
-  include Db2Session::Manager
+    include Db2Session::Manager
 
-  setup do
-    # get the credentials from environment variable
-    user_1 = ENV["USER1_ID"]   
-    user_1_password = ENV["USER1_PASSWORD"]
+    setup do
+      # get the credentials from environment variable
+      user_1 = ENV["USER1_ID"]   
+      user_1_password = ENV["USER1_PASSWORD"]
 
-    db2_session = Db2Session::Engine.routes.url_helpers
-    post db2_session.login_path, params: { userid: user_1, password: user_1_password }, as: :json
-    @request_token = @response["Authorization"].split(" ").last
+      db2_session = Db2Session::Engine.routes.url_helpers
+      post db2_session.login_path, params: { userid: user_1, password: user_1_password }, as: :json
+      @request_token = @response["Authorization"].split(" ").last
 
-    Thread.current[:connection] = current_connection
+      Thread.current[:connection] = current_connection
+    end
   end
 end
 ```
@@ -213,9 +215,8 @@ Then your query test class can extend the base query test class, for example:
 # app/test/queries/db2_connection_query_test.rb
 
 require "test_helper"
-require_relative "./db2_query_test"
 
-class Db2ConnectionQueryTest < Db2QueryTest
+class Db2ConnectionQueryTest < Db2Session::IntegrationTest
   test "connection status" do
     status = Db2ConnectionQuery.status
     assert status.connected
