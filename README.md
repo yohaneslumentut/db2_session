@@ -340,7 +340,7 @@ module Queries
   end
 end
 ```
-Go to `http://localhost:3000/grahpiql` and make a query request to `GraphQL`
+Go to `http://localhost:3000/grahpiql` and make a query request to `GraphQL` at `GraphiQL` editor:
 
 ```text
 query {
