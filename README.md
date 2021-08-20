@@ -213,10 +213,17 @@ end
 
 Install [graphiql-rails](https://github.com/rmosolgo/graphiql-rails) gem.
 
-Create an empty `app/assets/config/manifest.js`:
+Create an `app/assets/config/manifest.js`:
 ```bash
 $ mkdir -p app/assets/config && touch app/assets/config/manifest.js
 ```
+For API only, let the file empty and for full Rails application:
+```ruby
+# app/assets/config/manifest.js
+//= link_tree ../images
+//= link_directory ../stylesheets .css
+```
+
 And create a config/initializers/assets.rb with:
 ```ruby
 # config/initializers/assets.rb
