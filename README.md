@@ -94,15 +94,22 @@ end
 
 ### Session Controller
 
-Next, create a `Db2Controller` as a base controller and `Db2ConnectionController` that extend `Db2Controller`  where we can render `Db2ConnectionQuery.status`.
+Next, create a `Db2Session::Controller` as a base controller and `Db2ConnectionController` that extend the base controller where we can render `Db2ConnectionQuery.status`.
 
 ```ruby
-# app/controllers/db2_controller.rb
-class Db2Controller < Db2Session::ApplicationController
+# app/controllers/db2_session/controller.rb
+module Db2Session
+  class Controller < Db2Session::ApplicationController
+    private
+      def request_token
+        return nil unless request.authorization
+        request.authorization.split(" ").last
+      end
+  end
 end
 
 # app/controllers/db2_connection_controller.rb
-class Db2ConnectionController < Db2Controller
+class Db2ConnectionController < Db2Session::Controller
   def index
     status = Db2ConnectionQuery.status
     render json: {
@@ -136,7 +143,7 @@ Routes for Db2Session::Engine:
          logout GET  /logout(.:format)         db2_session/sessions#delete
 ```
 
-### Authenticate a Request
+### REST
 
 First, run your development server
 ```bash
@@ -181,7 +188,96 @@ Then the response will be as follow:
  {"data":{"user":"YOHANES","trx_time":14556.481167844,"connected":true}}
 ```
 
-Now the token can be use on each request to your application.
+Now the token can be use on each **REST** request to your application.
+
+
+### GraphQL
+
+Install [graphql-ruby](https://github.com/rmosolgo/graphql-ruby)
+
+Initialize `graphql-ruby`
+```bash
+$ rails generate graphql:install
+```
+
+Make a change at `app/controller/graphql_controller.rb` by replacing `ApplicationController` with `Db2Session::Controller`
+```ruby
+# app/controller/graphql_controller.rb
+class GraphqlController < Db2Session::Controller
+...
+end
+
+```
+
+### GraphiQL
+
+Install [graphiql-rails](https://github.com/rmosolgo/graphiql-rails) gem.
+
+Create an empty `app/assets/config/manifest.js`:
+```bash
+  mkdir -p app/assets/config && touch app/assets/config/manifest.js
+```
+And create a config/initializers/assets.rb with:
+```ruby
+# config/initializers/assets.rb
+if Rails.env.development?
+  Rails.application.config.assets.precompile += %w[graphiql/rails/application.js graphiql/rails/application.css]
+end
+```
+Then create `app/controllers/graphiql/rails/editors_controller.rb` to overide the `graphiql-rails` engine's editors controller
+```ruby
+  module GraphiQL
+    module Rails
+      class EditorsController < ActionController::Base
+        attr_reader :auth_token
+
+        include Db2Session::Manager
+
+        before_action :authenticate
+        def show
+          GraphiQL::Rails.config.headers["Authorization"] = -> (_) { "Bearer #{auth_token}" }
+        end
+
+        helper_method :graphql_endpoint_path
+        def graphql_endpoint_path
+          params[:graphql_path] || raise(%|You must include `graphql_path: "/my/endpoint"` when mounting GraphiQL::Rails::Engine|)
+        end
+
+        protected
+          def authenticate
+            unless auth_token
+              authenticate_or_request_with_http_basic do |username, password|
+                params[:userid] = username
+                params[:password] = password
+                connection = create_new_connection
+                @auth_token = token(connection.object_id)
+              rescue
+                false
+              end
+            end
+          end
+      end
+    end
+  end
+```
+Add the path at `config/routes.rb`
+```ruby
+...
+  Rails.application.routes.draw do
+    post "/graphql", to: "graphql#execute"
+
+    if Rails.env.development?
+      get "/graphiql" => "graphiql/rails/editors#show", graphql_path: "/graphql"
+    end
+  end
+...
+```
+Start development server
+```bash
+$ rails s
+```
+
+Go to `http://localhost:3000/grahpiql` and at the first visit, you will be asked `db2 credential` to get a token that will be used by `grahpiql-rails` on each request to `http://localhost:3000/grahpql`.
 
 ### How to test a Query
 
