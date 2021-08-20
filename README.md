@@ -215,7 +215,7 @@ Install [graphiql-rails](https://github.com/rmosolgo/graphiql-rails) gem.
 
 Create an empty `app/assets/config/manifest.js`:
 ```bash
-mkdir -p app/assets/config && touch app/assets/config/manifest.js
+$ mkdir -p app/assets/config && touch app/assets/config/manifest.js
 ```
 And create a config/initializers/assets.rb with:
 ```ruby
