@@ -226,6 +226,7 @@ end
 ```
 Then create `app/controllers/graphiql/rails/editors_controller.rb` to overide the `graphiql-rails` engine's editors controller
 ```ruby
+# app/controllers/graphiql/rails/editors_controller.rb
 module GraphiQL
   module Rails
     class EditorsController < ActionController::Base
@@ -262,6 +263,7 @@ end
 ```
 Add the path at `config/routes.rb`
 ```ruby
+# config/routes.rb
 Rails.application.routes.draw do
   ...
   post "/graphql", to: "graphql#execute"
@@ -278,6 +280,83 @@ $ rails s
 ```
 
 Go to `http://localhost:3000/grahpiql` and at the first visit, you will be asked `db2 credential` to get a token that will be used by `grahpiql-rails` on each request to `http://localhost:3000/grahpql`.
+
+Example of Connection status query:
+
+Create connection status type
+```ruby
+# app/graphql/types/connection_status.rb
+module Types
+  class ConnectionStatus < Types::BaseObject
+    field :user, String, null: true
+    field :trx_time, Integer, null: true
+    field :connected, Boolean, null: true
+  end
+end
+```
+
+Register at query type:
+```ruby
+# app/graphql/types/query_type.rb
+module Types
+  class QueryType < Types::BaseObject
+    ...
+    field :connection_status, resolver: Queries::ConnectionStatusQuery
+    ...
+  end
+end
+```
+
+Create a query resolver:
+```ruby
+# app/graphql/queries/connection_status_query.rb
+module Queries
+  class ConnectionStatusQuery < GraphQL::Schema::Resolver
+    type Types::ConnectionStatus, null: false
+
+    def resolve
+      {
+        user: connection.userid,
+        trx_time: connection.trx_time,
+        connected: status.connected
+      }
+    end
+
+    protected
+      def status
+        Db2ConnectionQuery.status
+      end
+
+      def connection
+        Db2ConnectionQuery.connection
+      end
+  end
+end
+```
+Go to `http://localhost:3000/grahpiql` and make a query request to `GraphQL`
+
+```text
+query {
+  connectionStatus {
+    user
+    trxTime
+    connected
+  }
+}
+```
+and you will get response:
+```text
+{
+  "data": {
+    "connectionStatus": {
+      "user": "YOUR USER ID",
+      "trxTime": ..........,
+      "connected": true
+    }
+  }
+}
+```
+Done.
 
 ### How to test a Query
 
