@@ -215,7 +215,7 @@ Install [graphiql-rails](https://github.com/rmosolgo/graphiql-rails) gem.
 
 Create an empty `app/assets/config/manifest.js`:
 ```bash
-  mkdir -p app/assets/config && touch app/assets/config/manifest.js
+mkdir -p app/assets/config && touch app/assets/config/manifest.js
 ```
 And create a config/initializers/assets.rb with:
 ```ruby
@@ -226,51 +226,51 @@ end
 ```
 Then create `app/controllers/graphiql/rails/editors_controller.rb` to overide the `graphiql-rails` engine's editors controller
 ```ruby
-  module GraphiQL
-    module Rails
-      class EditorsController < ActionController::Base
-        attr_reader :auth_token
+module GraphiQL
+  module Rails
+    class EditorsController < ActionController::Base
+      attr_reader :auth_token
 
-        include Db2Session::Manager
+      include Db2Session::Manager
 
-        before_action :authenticate
-        def show
-          GraphiQL::Rails.config.headers["Authorization"] = -> (_) { "Bearer #{auth_token}" }
-        end
+      before_action :authenticate
+      def show
+        GraphiQL::Rails.config.headers["Authorization"] = -> (_) { "Bearer #{auth_token}" }
+      end
 
-        helper_method :graphql_endpoint_path
-        def graphql_endpoint_path
-          params[:graphql_path] || raise(%|You must include `graphql_path: "/my/endpoint"` when mounting GraphiQL::Rails::Engine|)
-        end
+      helper_method :graphql_endpoint_path
+      def graphql_endpoint_path
+        params[:graphql_path] || raise(%|You must include `graphql_path: "/my/endpoint"` when mounting GraphiQL::Rails::Engine|)
+      end
 
-        protected
-          def authenticate
-            unless auth_token
-              authenticate_or_request_with_http_basic do |username, password|
-                params[:userid] = username
-                params[:password] = password
-                connection = create_new_connection
-                @auth_token = token(connection.object_id)
-              rescue
-                false
-              end
+      protected
+        def authenticate
+          unless auth_token
+            authenticate_or_request_with_http_basic do |username, password|
+              params[:userid] = username
+              params[:password] = password
+              connection = create_new_connection
+              @auth_token = token(connection.object_id)
+            rescue
+              false
             end
           end
-      end
+        end
     end
   end
+end
 ```
 Add the path at `config/routes.rb`
 ```ruby
-...
-  Rails.application.routes.draw do
-    post "/graphql", to: "graphql#execute"
+Rails.application.routes.draw do
+  ...
+  post "/graphql", to: "graphql#execute"
 
-    if Rails.env.development?
-      get "/graphiql" => "graphiql/rails/editors#show", graphql_path: "/graphql"
-    end
+  if Rails.env.development?
+    get "/graphiql" => "graphiql/rails/editors#show", graphql_path: "/graphql"
   end
-...
+  ...
+end
 ```
 Start development server
 ```bash
@@ -318,7 +318,6 @@ class Db2ConnectionQueryTest < Db2Session::IntegrationTest
     assert status.connected
   end
 end
-
 ```
 
 ## License
