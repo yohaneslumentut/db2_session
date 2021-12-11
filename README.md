@@ -258,6 +258,7 @@ module GraphiQL
               params[:userid] = username
               params[:password] = password
               connection = fetch_or_create_connection
+              connection.trx_time = current_time
               @auth_token = token(connection.object_id)
             rescue
               false
