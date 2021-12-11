@@ -257,12 +257,23 @@ module GraphiQL
             authenticate_or_request_with_http_basic do |username, password|
               params[:userid] = username
               params[:password] = password
-              connection = create_new_connection
+              connection = fetch_or_create_connection
               @auth_token = token(connection.object_id)
             rescue
               false
             end
           end
+        end
+
+        def connections
+          sessions.keys.map do |key|
+            conn = sessions.fetch(key)
+            conn.userid == params[:userid] ? conn : nil
+          end
+        end
+
+        def fetch_or_create_connection
+          connections.first || create_new_connection
         end
     end
   end
