@@ -27,7 +27,22 @@ Note: Please do the Db2Query [**Initialization**](https://github.com/yohaneslume
 
 Rules:
 > 1. **Queries** have to extend ApplicationQuery, an abstract query, which inherit all attributes and methods required from Db2Session::ApplicationQuery
-> 2. **Controllers** have to extend Db2Controller, an abstract controller, which inherit all attributes and methods required from Db2Session::ApplicationController 
+> 2. **Controllers** have to extend Db2Controller, an abstract controller, which inherit all attributes and methods required from Db2Session::ApplicationController
+
+### Load Configuration
+Modified `db2query` initializer and load the configuration at `app_root/config/initializers/db2query.rb`
+```ruby
+# app_root/config/initializers/db2query.rb
+
+require "db2_session"
+
+Db2Query::Base.initiation do |base|
+  base.set_field_types
+end
+
+Db2Session::ApplicationQuery.establish_connection
+```
+
 
 ### Mount Engine Authentication Path
 To be able to use the **authentication** path, mount the engine at your application `config/routes.rb`
